@@ -34,10 +34,40 @@
             color: #fff;
         }
         .table thead th { white-space: nowrap; }
+
+        .sidebar-backdrop { display: none; }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 250px;
+                min-height: 100vh;
+                transform: translateX(-100%);
+                transition: transform .3s ease;
+                z-index: 1050;
+                overflow-y: auto;
+            }
+            body.sidebar-open .sidebar {
+                transform: translateX(0);
+            }
+            .sidebar-backdrop {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,.5);
+                z-index: 1040;
+            }
+            body.sidebar-open .sidebar-backdrop {
+                display: block;
+            }
+        }
     </style>
     @stack('styles')
 </head>
 <body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="d-flex">
     <nav class="sidebar p-3" style="width: 250px;">
         <a href="{{ route('admin.dashboard') }}" class="brand d-flex align-items-center gap-2 text-decoration-none mb-4">
@@ -73,16 +103,21 @@
     </nav>
 
     <main class="flex-grow-1">
-        <nav class="navbar navbar-light bg-white border-bottom px-4">
-            <span class="navbar-brand mb-0 h5">@yield('title', 'Dashboard')</span>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-muted">
+        <nav class="navbar navbar-light bg-white border-bottom px-3 px-lg-4 flex-nowrap">
+            <div class="d-flex align-items-center gap-2 gap-lg-3" style="min-width: 0;">
+                <button type="button" id="sidebarToggle" class="btn btn-outline-secondary flex-shrink-0 d-lg-none" aria-label="Toggle menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <span class="navbar-brand mb-0 h5 text-truncate">@yield('title', 'Dashboard')</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3 flex-shrink-0">
+                <span class="text-muted d-none d-sm-inline">
                     <i class="bi bi-person-circle me-1"></i>{{ auth()->user()->name }}
                 </span>
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
                     <button class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        <i class="bi bi-box-arrow-right"></i><span class="d-none d-sm-inline ms-1">Logout</span>
                     </button>
                 </form>
             </div>
@@ -109,6 +144,14 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.body.classList.toggle('sidebar-open');
+    });
+    document.getElementById('sidebarBackdrop')?.addEventListener('click', () => {
+        document.body.classList.remove('sidebar-open');
+    });
+</script>
 @stack('scripts')
 </body>
 </html>
